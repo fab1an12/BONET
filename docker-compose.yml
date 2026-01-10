@@ -7,7 +7,7 @@ services:
     container_name: clickhouse_bonet
     ports:
       - "8123:8123" # HTTP interface
-      - "9000:9000" # Native TCP interface
+      - "9001:9000" # Native TCP interface (mapeado a 9001 para evitar conflictos)
       - "9009:9009" # Interserver HTTP (for replication)
     volumes:
       - clickhouse_data:/var/lib/clickhouse
