@@ -24,7 +24,6 @@ RUN pip install --no-cache-dir pyodbc clickhouse-connect
 
 # Copiar código
 COPY etl/ ./etl/
-COPY run_initial_load.py .
 
 # Crear script de entrada
 RUN echo '#!/bin/bash\n\
