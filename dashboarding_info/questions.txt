@@ -1,0 +1,30 @@
+1. Cuál es aprovechamiento del Lote XXXXX?
+   1. Puede no haberse procesado todavía, por lo que sería cero.
+   2. Puede haberse procesado en su totalidad y no quedar nada en Stock
+   3. Puede haberse procesado parcialmente.
+      1. Puede haber una parte en tolva (s) y otra en el almacén central
+2. Qué producción hemos obtenido del lote XXXXX?
+   1. Si no se ha procesado no hay producción de ningún artículo
+   2. Si se ha procesado, indica que se han producido (o se van a producir) determinados artículos.
+   3. Los resultados se muestran por código de artículo (junto con la descripción del mismo. Se ofrecen Kg, (pallets?), cajas-sacos(¿), porcentaje…
+3. Cuantos subproductos y cuales, hemos obtenido del lote XXXXX?
+   1. Los subproductos respecto a su calibre son: 
+      1. Platillo = petita (menos de 45mm)
+      2. Mediana (de 45mm a 50mm)
+      3. Carril (de 50mm a 65mm)
+      4. (¿) (de 65mm a 80mm)
+      5. Grossa (más de 80mm)
+      6. Los subproductos de acuerdo a su calibre se vuelven a procesar y se mezclan (o no) con otros lotes.
+   2. Los subproductos respecto a su calidad son:
+      1. Conformes.
+      2. No conformes:
+         1. Rebuig 2 (se puede volver a aprovechar)
+         2. Rebuig 3 (no se puede volver a aprovechar)
+      3. Un subproducto REBUIG2 (no conforme) se puede volver a aprovechar, por lo que entra de nuevo en el sistema y se puede procesar y ser conforme.
+4. Qué stock tenemos en tolva X del lote XXXXX?
+   1. Cuando procesamos un lote, quiere decir que hay que lavarlo en lavadora (empieza a salir REBUIG 3) y acto seguido se calibra (ya has quitado el Rebuig3) y empiezan a salir los subproductos de calibre (platillo, mediana …). Luego el lote pasa a Tolva (T1, T2, T3, T4, T5, T6, S1, S2, CC, CF, CT…) Después de salir de Tolva ( y antes de pesarlo-envasarlo) se vuelve a triar y ahí, ahí es donde sale el REBUIG2.
+   2. Tener en cuenta que puedes tener el mismo lote en más de una tolva, el encargado puede decidir por ejemplo: procesa 2BB del lote XXXXX a T2 y los otros tres BB del mismo lote a T5.
+5. Qué stock tenemos en el almacén del lote XXXXX?
+   1. Esto es mercancía que ha llegado pero que todavía no se ha procesado.
+   2. A veces nos interesa mucho, mucho, saber los stocks, para así saber cuanto hay que comprar
+6. Muéstrame un grafico de barras y de quesitos con los aprovechamientos en % del lote XXXXX?

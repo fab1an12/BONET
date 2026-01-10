@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <!-- Configuración del servidor -->
+    <logger>
+        <level>information</level>
+        <console>1</console>
+    </logger>
+
+    <!-- Permitir conexiones desde cualquier IP -->
+    <listen_host>0.0.0.0</listen_host>
+
+    <!-- Configuración de timezone -->
+    <timezone>Europe/Madrid</timezone>
+
+    <!-- Base de datos por defecto -->
+    <default_database>bonet_analytics</default_database>
+</clickhouse>

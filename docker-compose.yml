@@ -1,0 +1,128 @@
+services:
+  # ============================================================================
+  # CLICKHOUSE - Base de datos analítica
+  # ============================================================================
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1
+    container_name: clickhouse_bonet
+    ports:
+      - "8123:8123" # HTTP interface
+      - "9000:9000" # Native TCP interface
+      - "9009:9009" # Interserver HTTP (for replication)
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+      - ./clickhouse/config:/etc/clickhouse-server/config.d
+      - ./clickhouse/users:/etc/clickhouse-server/users.d
+    environment:
+      - CLICKHOUSE_DB=bonet_analytics
+      - CLICKHOUSE_USER=bonet_user
+      - CLICKHOUSE_PASSWORD=Bonet2024!
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: [ "CMD", "clickhouse-client", "--query", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ============================================================================
+  # POSTGRES - Base de datos para persistencia de Metabase
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_metabase
+    environment:
+      - POSTGRES_USER=metabase
+      - POSTGRES_PASSWORD=Metabase2024!
+      - POSTGRES_DB=metabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U metabase -d metabase" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ============================================================================
+  # METABASE - Dashboard y visualización
+  # ============================================================================
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase_bonet
+    ports:
+      - "3000:3000"
+    environment:
+      # Configuración de base de datos para persistencia (Postgres en lugar de H2)
+      - MB_DB_TYPE=postgres
+      - MB_DB_DBNAME=metabase
+      - MB_DB_PORT=5432
+      - MB_DB_USER=metabase
+      - MB_DB_PASS=Metabase2024!
+      - MB_DB_HOST=postgres
+      # Configuración general
+      - MB_SITE_NAME=BONET Analytics
+      - MB_SITE_LOCALE=es
+      - JAVA_TIMEZONE=Europe/Madrid
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  # ============================================================================
+  # ETL - Jobs de carga de datos
+  # ============================================================================
+  etl:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: etl_bonet
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      # SQL Server - Configuración para instancia nombrada
+      # LOCAL (desarrollo): usar host.docker.internal y puerto fijo
+      # PRODUCCIÓN: usar IP del servidor y nombre de instancia
+      - MSSQL_HOST=${MSSQL_HOST:-host.docker.internal}
+      - MSSQL_PORT=${MSSQL_PORT:-1433}
+      - MSSQL_INSTANCE=${MSSQL_INSTANCE:-}
+      - MSSQL_DATABASE=${MSSQL_DATABASE:-BONETV9}
+      - MSSQL_USER=${MSSQL_USER:-SA}
+      - MSSQL_PASSWORD=${MSSQL_PASSWORD:-Passw0rd!}
+      - MSSQL_TRUST_CERT=${MSSQL_TRUST_CERT:-yes}
+      # ClickHouse - referencia al servicio
+      - CH_HOST=clickhouse
+      - CH_PORT=8123
+      - CH_DATABASE=bonet_analytics
+      - CH_USER=bonet_user
+      - CH_PASSWORD=Bonet2024!
+    # No auto-start - ejecutar manualmente con:
+    # docker compose run --rm etl initial
+    # docker compose run --rm etl incremental
+    profiles:
+      - tools
+
+# ============================================================================
+# VOLÚMENES PERSISTENTES
+# ============================================================================
+volumes:
+  clickhouse_data:
+    driver: local
+  clickhouse_logs:
+    driver: local
+  postgres_data:
+    driver: local
