@@ -31,6 +31,18 @@ services:
     restart: unless-stopped
 
   # ============================================================================
+  # TABIX - UI Web para ClickHouse
+  # ============================================================================
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client
+    container_name: tabix_bonet
+    ports:
+      - "8080:80"
+    depends_on:
+      - clickhouse
+    restart: unless-stopped
+
+  # ============================================================================
   # POSTGRES - Base de datos para persistencia de Metabase
   # ============================================================================
   postgres:
