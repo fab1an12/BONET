@@ -73,10 +73,22 @@ def fetch_new_records(
     else:
         # Formatear el valor según el tipo
         if column_type == 'datetime':
+            # Manejar diferentes tipos de datetime
             if isinstance(last_value, datetime):
+                # Si tiene timezone, convertir a naive (sin tz)
+                if last_value.tzinfo is not None:
+                    last_value = last_value.replace(tzinfo=None)
                 formatted_value = last_value.strftime('%Y-%m-%d %H:%M:%S')
             else:
+                # Es un string - limpiar timezone si existe
                 formatted_value = str(last_value)
+                # Eliminar timezone (+XX:XX o -XX:XX al final)
+                if '+' in formatted_value:
+                    formatted_value = formatted_value.split('+')[0].strip()
+                elif formatted_value.count('-') > 2:  # Tiene timezone negativo
+                    parts = formatted_value.rsplit('-', 1)
+                    if ':' in parts[-1]:  # Es un timezone, no parte de la fecha
+                        formatted_value = parts[0].strip()
             query = f"SELECT * FROM [{table_name}] WHERE [{column_name}] > '{formatted_value}'"
         else:
             # ID numérico
