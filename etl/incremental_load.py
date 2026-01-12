@@ -78,7 +78,8 @@ def fetch_new_records(
                 # Si tiene timezone, convertir a naive (sin tz)
                 if last_value.tzinfo is not None:
                     last_value = last_value.replace(tzinfo=None)
-                formatted_value = last_value.strftime('%Y-%m-%d %H:%M:%S')
+                # Formato ISO 8601: YYYY-MM-DDTHH:MM:SS
+                formatted_value = last_value.strftime('%Y-%m-%dT%H:%M:%S')
             else:
                 # Es un string - limpiar timezone si existe
                 formatted_value = str(last_value)
@@ -89,7 +90,11 @@ def fetch_new_records(
                     parts = formatted_value.rsplit('-', 1)
                     if ':' in parts[-1]:  # Es un timezone, no parte de la fecha
                         formatted_value = parts[0].strip()
-            query = f"SELECT * FROM [{table_name}] WHERE [{column_name}] > '{formatted_value}'"
+                # Reemplazar espacio por T para formato ISO 8601
+                formatted_value = formatted_value.replace(' ', 'T')
+            
+            # Usar CONVERT con estilo 126 (ISO 8601) para máxima compatibilidad
+            query = f"SELECT * FROM [{table_name}] WHERE [{column_name}] > CONVERT(datetime, '{formatted_value}', 126)"
         else:
             # ID numérico
             query = f"SELECT * FROM [{table_name}] WHERE [{column_name}] > {last_value}"
