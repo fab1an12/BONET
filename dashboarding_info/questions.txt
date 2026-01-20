@@ -44,8 +44,7 @@ PRODUCTIVIDAD
          a. Esto es mercancía que ha llegado pero que todavía no se ha procesado.
         b. A veces nos interesa mucho, mucho, saber los stocks, para así saber cuanto hay
             que comprar
-6. Muéstrame un grafico de barras y de quesitos con los aprovechamientos en % del lote
-    XXXXX?
+6. Muéstrame un grafico de barras y de quesitos con los aprovechamientos en % del lote XXXXX?
 7. En el DashBoard o panel de control se pide al usuario que lote (o lotes) quiere analizar.
     Y … ¿Qué se ofrece de resultado a la pregunta del lote?
         a. Se exhiben gráficos de barras/circulares donde se muestra la distribución de las
