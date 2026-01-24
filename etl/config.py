@@ -26,54 +26,33 @@ CLICKHOUSE_CONFIG = {
     "password": os.getenv("CH_PASSWORD", "Bonet2024!")
 }
 
-# Tablas a migrar organizadas por grupos
+# =============================================================================
+# TABLAS OPTIMIZADAS PARA EL DASHBOARD DE METABASE
+# Solo se cargan las 11 tablas necesarias para los gráficos
+# Última actualización: 2026-01-24
+# =============================================================================
 TABLES_CONFIG = {
-    # GRUPO 1: Tablas de la Procedure AT_GETTRAZA (Documentos)
-    # Nota: columnas en MAYÚSCULAS porque así se almacenan en ClickHouse
-    "procedure_tables": [
-        {"name": "CabeFacV", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "LineFact", "incremental_column": "IDFACV", "type": "id"},
-        {"name": "CabeAlbV", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "CabeAlbC", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "LineAlba", "incremental_column": "IDALBV", "type": "id"},
-        {"name": "__CabeDepV", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "__CabeDepC", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "__LineDepo", "incremental_column": "IDDEPV", "type": "id"},
-        {"name": "CabeTras", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "LineTras", "incremental_column": "IDTRA", "type": "id"},
-        {"name": "CabeRegu", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "LineRegu", "incremental_column": "IDREG", "type": "id"},
-        {"name": "CabeInve", "incremental_column": "FECHA", "type": "datetime"},
-        {"name": "LineInve", "incremental_column": "IDINVEN", "type": "id"},
+    # GRUPO 1: Tablas de Documentos (para info del lote: proveedor, fecha entrada)
+    "document_tables": [
+        {"name": "CabeAlbC", "incremental_column": "FECHA", "type": "datetime"},  # G9: Info Lote (proveedor)
+        {"name": "LineAlba", "incremental_column": "IDALBV", "type": "id"},        # G9: Líneas albaranes
     ],
     
     # GRUPO 2: Tablas Maestras (carga completa siempre)
     "master_tables": [
-        {"name": "Articulo", "incremental_column": None, "type": "full"},
-        {"name": "Almacen", "incremental_column": None, "type": "full"},
-        {"name": "AT_TIPOARTICULO", "incremental_column": None, "type": "full"},
-        {"name": "AT_CALIBRES", "incremental_column": None, "type": "full"},
-        {"name": "AT_CALIBRES_REL", "incremental_column": None, "type": "full"},
+        {"name": "Articulo", "incremental_column": None, "type": "full"},      # G4, G10: Catálogo artículos
+        {"name": "Almacen", "incremental_column": None, "type": "full"},       # G2: Catálogo almacenes/tolvas
+        {"name": "AT_CALIBRES", "incremental_column": None, "type": "full"},   # G3, G10: Catálogo calibres
     ],
     
-    # GRUPO 3: Tablas de Producción y Stock
+    # GRUPO 3: Tablas de Producción y Stock (核心 del dashboard)
     "production_tables": [
-        {"name": "AT_PRODUCCION", "incremental_column": "IDPRODUCCION", "type": "id"},
-        {"name": "AT_PRODUCCIONES", "incremental_column": "IDALBC", "type": "id"},
-        {"name": "AT_STOCK", "incremental_column": "ID", "type": "id"},
-        {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": "ID", "type": "id"},
-        {"name": "STOCKALM", "incremental_column": "ID", "type": "id"},
-        {"name": "AT_SUBPRODUCTO", "incremental_column": "IDSUBPRODUCTO", "type": "id"},
-        {"name": "AT_TRASPASOS", "incremental_column": "IDTRASPASO", "type": "id"},
-        {"name": "AT_TRAZABILIDAD", "incremental_column": None, "type": "full"},
-        {"name": "AT_TRANSACCION_DET", "incremental_column": "ID_DETALLE", "type": "id"},
-        {"name": "AT_IDENTIFICADORES_DET", "incremental_column": "IDIDENTIFICADOR", "type": "id"},
-    ],
-    
-    # GRUPO 4: Tablas de Relaciones
-    "relation_tables": [
-        {"name": "AT_REGISTROS_REL", "incremental_column": None, "type": "full"},
-        {"name": "VINCULOS", "incremental_column": None, "type": "full"},
+        {"name": "AT_PRODUCCION", "incremental_column": "IDPRODUCCION", "type": "id"},     # G6, G7: Aprovechamiento
+        {"name": "AT_PRODUCCIONES", "incremental_column": "IDALBC", "type": "id"},         # G4, G8: Producción detalle
+        {"name": "AT_STOCK", "incremental_column": "ID", "type": "id"},                    # G1, G2, G6, G7: Stock actual
+        {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": "ID", "type": "id"},      # G3: Stock con identificador
+        {"name": "AT_SUBPRODUCTO", "incremental_column": "IDSUBPRODUCTO", "type": "id"},   # G3, G10: Subproductos
+        {"name": "AT_TRASPASOS", "incremental_column": "IDTRASPASO", "type": "id"},        # G5: Historial traspasos
     ],
 }
 
