@@ -34,7 +34,7 @@ CLICKHOUSE_CONFIG = {
 TABLES_CONFIG = {
     # GRUPO 1: Tablas de Documentos (para info del lote: proveedor, fecha entrada)
     "document_tables": [
-        {"name": "CabeAlbC", "incremental_column": "FECHA", "type": "datetime"},  # G9: Info Lote (proveedor)
+        {"name": "CabeAlbC", "incremental_column": "IDALBC", "type": "id"},  # G9: Info Lote (proveedor) - Usa ID, no fecha
         {"name": "LineAlba", "incremental_column": "IDALBV", "type": "id"},        # G9: Líneas albaranes
     ],
     
