@@ -35,7 +35,7 @@ TABLES_CONFIG = {
     # GRUPO 1: Tablas de Documentos (para info del lote: proveedor, fecha entrada)
     "document_tables": [
         {"name": "CabeAlbC", "incremental_column": "IDALBC", "type": "id"},  # G9: Info Lote (proveedor) - Usa ID, no fecha
-        {"name": "LineAlba", "incremental_column": "IDALBV", "type": "id"},        # G9: Líneas albaranes
+        {"name": "LineAlba", "incremental_column": "IDLIN", "type": "id"},         # G9: Líneas albaranes (IDLIN siempre poblado)
     ],
     
     # GRUPO 2: Tablas Maestras (carga completa siempre)
@@ -49,8 +49,8 @@ TABLES_CONFIG = {
     "production_tables": [
         {"name": "AT_PRODUCCION", "incremental_column": "IDPRODUCCION", "type": "id"},     # G6, G7: Aprovechamiento
         {"name": "AT_PRODUCCIONES", "incremental_column": "IDALBC", "type": "id"},         # G4, G8: Producción detalle
-        {"name": "AT_STOCK", "incremental_column": "ID", "type": "id"},                    # G1, G2, G6, G7: Stock actual
-        {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": "ID", "type": "id"},      # G3: Stock con identificador
+        {"name": "AT_STOCK", "incremental_column": None, "type": "full"},                  # G1, G2, G6, G7: Stock actual (full - registros se eliminan)
+        {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": None, "type": "full"},    # G3: Stock con identificador (full - registros se eliminan)
         {"name": "AT_SUBPRODUCTO", "incremental_column": "IDSUBPRODUCTO", "type": "id"},   # G3, G10: Subproductos
         {"name": "AT_TRASPASOS", "incremental_column": "IDTRASPASO", "type": "id"},        # G5: Historial traspasos
     ],
