@@ -201,6 +201,16 @@ def migrate_table(
         # Crear tabla en ClickHouse
         ch_table_name = table_name.replace("__", "_")  # Normalizar nombre
 
+        # Si no se fuerza el drop, verificar si ya existe y tiene datos
+        if not drop_existing and ch_client.table_exists(ch_table_name):
+            current_count = ch_client.get_table_count(ch_table_name)
+            if current_count > 0:
+                stats["status"] = "skipped"
+                stats["migrated_count"] = current_count
+                stats["error"] = "Ya existe y tiene datos"
+                print(f"  ⏭️  {table_name}: Ya existe ({current_count:,} registros). Saltando...")
+                return stats
+
         if drop_existing:
             print(" 🗑️  Eliminando tabla existente...")
             ch_client.drop_table(ch_table_name)
@@ -244,7 +254,7 @@ def migrate_table(
     return stats
 
 
-def run_initial_load(tables: List[Dict] = None, drop_existing: bool = True):
+def run_initial_load(tables: List[Dict] = None, drop_existing: bool = False):
     """
     Ejecuta la carga inicial de todas las tablas
 

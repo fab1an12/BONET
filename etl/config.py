@@ -53,6 +53,7 @@ TABLES_CONFIG = {
         {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": None, "type": "full"},    # G3: Stock con identificador (full - registros se eliminan)
         {"name": "AT_SUBPRODUCTO", "incremental_column": "IDSUBPRODUCTO", "type": "id"},   # G3, G10: Subproductos
         {"name": "AT_TRASPASOS", "incremental_column": "IDTRASPASO", "type": "id"},        # G5: Historial traspasos
+        {"name": "AT_TRANSACCION_DET", "incremental_column": "ID_DETALLE", "type": "id"},  # Transacciones detalladas (reprocesamientos)
     ],
 }
 

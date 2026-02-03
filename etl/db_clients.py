@@ -119,6 +119,7 @@ class SQLServerClient:
             "AT_STOCK_IDENTIFICADOR": "ID",
             "AT_SUBPRODUCTO": "IDSUBPRODUCTO",
             "AT_TRASPASOS": "IDTRASPASO",
+            "AT_TRANSACCION_DET": "ID_DETALLE",
             "Articulo": "CODART",
             "Almacen": "CODALM",
             "AT_CALIBRES": "IDCALIBRE",
