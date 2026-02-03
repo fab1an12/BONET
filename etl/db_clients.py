@@ -108,20 +108,36 @@ class SQLServerClient:
         Yields:
             Lista de diccionarios con los datos del batch
         """
+        # Primary keys conocidas para ORDER BY estable (evita duplicados en OFFSET/FETCH)
+        PRIMARY_KEYS = {
+            "CabeAlbC": "IDALBC",
+            "LineAlba": "IDLIN",
+            "AT_PRODUCCION": "IDPRODUCCION",
+            "AT_PRODUCCIONES": "IDPRODUCCIONES",
+            "AT_STOCK": "ID",
+            "AT_STOCK_IDENTIFICADOR": "ID",
+            "AT_SUBPRODUCTO": "IDSUBPRODUCTO",
+            "AT_TRASPASOS": "IDTRASPASO",
+            "Articulo": "CODART",
+            "Almacen": "CODALM",
+            "AT_CALIBRES": "IDCALIBRE",
+        }
+        
         total = self.get_table_count(table_name)
         offset = 0
 
-        # Obtener la primera columna para ORDER BY
-        schema = self.get_table_schema(table_name)
-        if not schema:
-            return
-
-        first_col = schema[0]["COLUMN_NAME"]
+        # Usar primary key conocida o fallback a primera columna
+        order_col = PRIMARY_KEYS.get(table_name)
+        if not order_col:
+            schema = self.get_table_schema(table_name)
+            if not schema:
+                return
+            order_col = schema[0]["COLUMN_NAME"]
 
         while offset < total:
             query = f"""
             SELECT * FROM [{table_name}]
-            ORDER BY [{first_col}]
+            ORDER BY [{order_col}]
             OFFSET {offset} ROWS
             FETCH NEXT {batch_size} ROWS ONLY
             """
