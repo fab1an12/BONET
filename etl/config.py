@@ -48,7 +48,7 @@ TABLES_CONFIG = {
     # GRUPO 3: Tablas de Producción y Stock (核心 del dashboard)
     "production_tables": [
         {"name": "AT_PRODUCCION", "incremental_column": "IDPRODUCCION", "type": "id"},     # G6, G7: Aprovechamiento
-        {"name": "AT_PRODUCCIONES", "incremental_column": "IDALBC", "type": "id"},         # G4, G8: Producción detalle
+        {"name": "AT_PRODUCCIONES", "incremental_column": None, "type": "full"},           # G4, G8: Producción detalle (full - seguridad ante líneas nuevas)
         {"name": "AT_STOCK", "incremental_column": None, "type": "full"},                  # G1, G2, G6, G7: Stock actual (full - registros se eliminan)
         {"name": "AT_STOCK_IDENTIFICADOR", "incremental_column": None, "type": "full"},    # G3: Stock con identificador (full - registros se eliminan)
         {"name": "AT_SUBPRODUCTO", "incremental_column": "IDSUBPRODUCTO", "type": "id"},   # G3, G10: Subproductos

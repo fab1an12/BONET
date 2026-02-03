@@ -237,10 +237,10 @@ def migrate_full_table(
             print(f"  ⚠️  {table_name}: No existe en SQL Server")
             return stats
         
-        # Obtener todos los registros de SQL Server
-        all_records = sql_client.execute_query(f"SELECT * FROM [{table_name}]")
+        # Contar registros
+        total_records = sql_client.get_table_count(table_name)
         
-        if not all_records:
+        if total_records == 0:
             stats['status'] = 'skipped'
             stats['error'] = "Tabla vacía"
             print(f"  ⚠️  {table_name}: Tabla vacía")
@@ -256,13 +256,22 @@ def migrate_full_table(
             ch_client.execute_command(f"TRUNCATE TABLE {ch_table_name}")
             print("  🗑️  Tabla truncada")
         
-        # Limpiar e insertar
-        clean_records = clean_data_for_clickhouse(all_records, ch_columns)
-        inserted = ch_client.insert_data(ch_table_name, clean_records, column_names)
+        # Migrar en batches
+        total_inserted = 0
+        batch_size = 50000
+        print(f"  📦 Migrando {total_records:,} registros en batches...")
         
-        stats['new_records'] = inserted
+        for batch in sql_client.fetch_data_in_batches(table_name, batch_size):
+            clean_records = clean_data_for_clickhouse(batch, ch_columns)
+            inserted = ch_client.insert_data(ch_table_name, clean_records, column_names)
+            total_inserted += inserted
+            
+            # Mostrar progreso
+            print(f"      Batch: {inserted:,} registros (Total: {total_inserted:,})")
+        
+        stats['new_records'] = total_inserted
         stats['status'] = 'success'
-        print(f"  ✅ {table_name}: {inserted:,} registros (carga completa)")
+        print(f"  ✅ {table_name}: {total_inserted:,} registros (carga completa)")
         
     except Exception as e:
         stats['status'] = 'error'
