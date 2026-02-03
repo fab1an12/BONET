@@ -109,11 +109,12 @@ class SQLServerClient:
             Lista de diccionarios con los datos del batch
         """
         # Primary keys conocidas para ORDER BY estable (evita duplicados en OFFSET/FETCH)
+        # AT_PRODUCCIONES no tiene PK única, usamos combinación para estabilidad
         PRIMARY_KEYS = {
             "CabeAlbC": "IDALBC",
             "LineAlba": "IDLIN",
             "AT_PRODUCCION": "IDPRODUCCION",
-            "AT_PRODUCCIONES": "IDPRODUCCIONES",
+            "AT_PRODUCCIONES": "IDALBC, FECHA, CODART, LOTE",
             "AT_STOCK": "ID",
             "AT_STOCK_IDENTIFICADOR": "ID",
             "AT_SUBPRODUCTO": "IDSUBPRODUCTO",
@@ -128,16 +129,24 @@ class SQLServerClient:
 
         # Usar primary key conocida o fallback a primera columna
         order_col = PRIMARY_KEYS.get(table_name)
-        if not order_col:
+        
+        # Si la columna tiene comas, es una lista de columnas (validar nombres)
+        if order_col and "," in order_col:
+            cols = [c.strip() for c in order_col.split(",")]
+            order_clause = ", ".join([f"[{c}]" for c in cols])
+        elif order_col:
+            order_clause = f"[{order_col}]"
+        else:
+            # Fallback automático
             schema = self.get_table_schema(table_name)
             if not schema:
                 return
-            order_col = schema[0]["COLUMN_NAME"]
+            order_clause = f"[{schema[0]['COLUMN_NAME']}]"
 
         while offset < total:
             query = f"""
             SELECT * FROM [{table_name}]
-            ORDER BY [{order_col}]
+            ORDER BY {order_clause}
             OFFSET {offset} ROWS
             FETCH NEXT {batch_size} ROWS ONLY
             """
